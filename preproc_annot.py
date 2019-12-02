@@ -18,20 +18,15 @@ def main():
 
     num_cropped_images = 0
     annots = []
-    for i, row in logos_frame.iterrows():
+    for _, row in logos_frame.iterrows():
         img_name = row[0]
         cls_name = row[1]
         cls_idx = config.CLASS_NAMES.index(cls_name)
-        subset = row[2]
         x1, y1, x2, y2 = row[3:]
         w, h = (x2 - x1), (y2 - y1)
         if w == 0 or h == 0:
             print('Skip:', img_name)
             continue
-        img = io.imread(os.path.join(config.IMAGES_DIR, img_name))
-        img_height, img_width, _ = img.shape
-        x = (x1 + x2) / 2
-        y = (y1 + y1) / 2
         annot = ','.join([img_name, str(x1), str(y1), str(x2), str(y2), str(cls_idx)])
         annots.append(annot)
         num_cropped_images += 1
