@@ -16,8 +16,7 @@ def main():
     if not os.path.exists(config.CROPPED_IMAGES_DIR):
         os.makedirs(config.CROPPED_IMAGES_DIR)
 
-    num_cropped_images = 0
-    annots = []
+    annots_trans, annots_tests = [], []
     for _, row in logos_frame.iterrows():
         img_name = row[0]
         cls_name = row[1]
@@ -28,20 +27,22 @@ def main():
             print('Skip:', img_name)
             continue
         annot = ','.join([img_name, str(x1), str(y1), str(x2), str(y2), str(cls_idx)])
-        annots.append(annot)
-        num_cropped_images += 1
+        if row[2] <= 5:
+            annots_trans.append(annot)
+        else:
+            annots_tests.append(annot)
 
-    np.random.shuffle(annots)
-    num_train = int(num_cropped_images * 0.8)
+    num_train = 0;
     with open(config.CROPPED_ANNOT_FILE, 'w') as f:
-        for annot in annots[:num_train]:
+        for annot in annots_trans[:]:
             f.writelines(annot)
             f.writelines("\n")
+            num_train+=1
 
     seen = set()
     num_test = 0
     with open(config.CROPPED_ANNOT_FILE_TEST, 'w') as f:
-        for annot in annots[num_train:]:
+        for annot in annots_tests[:]:
             img_fn = annot.split(',')[0]
             if img_fn in seen:
                 continue
